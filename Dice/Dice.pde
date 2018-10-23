@@ -1,5 +1,10 @@
+/* @pjs preload="heart.png","spade.png","clubs.png","diamonds.png"; */
 import java.util.Arrays;
 Die[] diceRoll;
+Card[] dealCards;
+int NUM_OF_CARDS = 9;
+int rowOfCards = 3;
+int collumnOfCards = 3;
 int sum = 0;
 int gameScreen = 0;
 boolean autoroll = false;
@@ -7,6 +12,8 @@ float currMax;
 float totalMax;
 int[] faceFreq = new int[6];
 int[] currFaceFreq = new int[6];
+
+
 void setup() {
   //no loop means that draw is only called once
   //OR if you ever call redraw()
@@ -14,12 +21,21 @@ void setup() {
   background(255);
   frameRate(10);
   diceRoll = new Die[25];
+  dealCards = new Card[NUM_OF_CARDS];
   for (int j = 0; j < 5; j ++) {
     int yPos = 100 * j + 30;
     for (int i = 0; i < 5; i ++) {
       int xPos = 100 * i + 30;
       diceRoll[j*5 + i] = new Die(xPos, yPos);
       sum += diceRoll[i].toggle;
+    }
+  }
+
+  for (int j = 0; j < collumnOfCards; j ++) {
+    int yPos = 200 * j + 30;
+    for (int i = 0; i < rowOfCards; i ++) {
+      int xPos = 200 * i + 30;
+      dealCards[j*3 + i] = new Card(xPos, yPos);
     }
   }
 }
@@ -45,6 +61,12 @@ void mousePressed() {
       if (!autoroll)
         sum = 0;
       reRollAll();
+    }
+  }
+  if (gameScreen == 1) {
+    Arrays.fill(currFaceFreq, 0);
+    for (int i = 0; i < dealCards.length; i++) {
+      dealCards[i].shuffle();
     }
   }
 }
@@ -114,6 +136,10 @@ void drawGameScreen() {
   background(255);
   textAlign(LEFT);
   textSize(12);
+  for (int i = 0; i < dealCards.length; i++) {
+    dealCards[i].show_card();
+  }
+
   text("Return to home >", 30, 15);
   if (mouseX > 0 && mouseX < 150 && mouseY > 0 && mouseY < 30) {
     if (mousePressed) {
@@ -288,5 +314,120 @@ class Die {
     show_rect();
     show_ellipse();
     println(toggle);
+  }
+}
+//End of Dice
+
+
+class Card {
+  PImage heart;
+  PImage spade;
+  PImage clubs;
+  PImage diamonds;
+  int xPos;
+  int yPos;
+  int toggleNumber = 1;
+  int toggleSuit = 3;
+
+  Card(int x, int y) {
+    xPos = x;
+    yPos = y;
+    heart = loadImage("heart.png");
+    diamonds = loadImage("diamonds.png");
+    spade = loadImage("spade.png");
+    clubs = loadImage("clubs.png");
+    shuffle();
+  }
+  void shuffle() {
+    toggleNumber = (int)random(1, 14);
+    toggleSuit = (int)random(1, 5);
+  }
+
+  void show_card() { 
+    //Dice
+    fill(255);
+    rect(xPos, yPos, 100, 150, 2);
+    show_face();
+    show_suit();
+  }
+
+  void show_face() {
+    if (toggleSuit == 1 || toggleSuit == 2)
+      fill(255, 0, 0);
+
+    if (toggleSuit == 3 || toggleSuit == 4)
+      fill(0);
+    textSize(20);
+    switch(toggleNumber) {
+    case 1:
+      text("A", xPos +  10, yPos + 30);
+      text("A", xPos +  80, yPos + 140);
+      break;
+    case 2:
+      text("2", xPos +  10, yPos + 30);
+      text("2", xPos +  80, yPos + 140);
+      break;
+    case 3:
+      text("3", xPos +  10, yPos + 30);
+      text("3", xPos +  80, yPos + 140);
+      break;
+    case 4:
+      text("4", xPos +  10, yPos + 30);
+      text("4", xPos +  80, yPos + 140);
+      break;
+    case 5:
+      text("5", xPos +  10, yPos + 30);
+      text("5", xPos +  80, yPos + 140);
+      break;
+    case 6:
+      text("6", xPos +  10, yPos + 30);
+      text("6", xPos +  80, yPos + 140);
+      break;
+    case 7:
+      text("7", xPos +  10, yPos + 30);
+      text("7", xPos +  80, yPos + 140);
+      break;
+    case 8:
+      text("8", xPos +  10, yPos + 30);
+      text("8", xPos +  80, yPos + 140);
+      break;
+    case 9:
+      text("9", xPos +  10, yPos + 30);
+      text("9", xPos +  80, yPos + 140);
+      break;
+    case 10:
+      text("10", xPos +  10, yPos + 30);
+      text("10", xPos +  70, yPos + 140);
+      break;
+    case 11:
+      text("J", xPos +  10, yPos + 30);
+      text("J", xPos +  80, yPos + 140);
+      break;
+    case 12:
+      text("Q", xPos +  10, yPos + 30);
+      text("Q", xPos +  80, yPos + 140);
+      break;
+    case 13:
+      text("K", xPos +  10, yPos + 30);
+      text("K", xPos +  80, yPos + 140);
+      break;
+    }
+  }
+
+  void show_suit() {
+    switch(toggleSuit) {
+    case 1:
+      image(heart, xPos + 20, yPos + 50, 50, 50);
+      break;
+    case 2:
+      image(diamonds, xPos + 20, yPos + 50, 50, 50);
+      break;
+    case 3:
+      image(spade, xPos + 20, yPos + 50, 50, 50);
+      break;
+    case 4:
+      image(clubs, xPos + 20, yPos + 50, 50, 50);
+      break;
+    }
   }
 }
