@@ -1,6 +1,7 @@
 import java.util.Arrays;
 Die[] diceRoll;
 int sum = 0;
+int gameScreen = 0;
 boolean autoroll = false;
 float currMax;
 float totalMax;
@@ -24,6 +25,63 @@ void setup() {
 }
 
 void draw() {
+  if (gameScreen == 0) {
+    initScreen();
+  } else if (gameScreen == 1) {
+    drawGameScreen();
+  } else if (gameScreen == 2) {
+    diceSimulator();
+  }
+  println(gameScreen);
+}
+
+void mousePressed() {
+  if (gameScreen == 2) {
+    if ((mouseX >= 550 && mouseX <= 650)&& (mouseY >= 600 && mouseY <= 650)) { 
+      if (!autoroll)
+        sum = 0;
+      autoroll = !autoroll;
+    } else {
+      if (!autoroll)
+        sum = 0;
+      reRollAll();
+    }
+  }
+}
+
+void initScreen() {
+  background(80);
+  textAlign(CENTER);
+  fill(135, 206, 250);
+  textSize(80);
+  text("Dice", width/2, height/2);
+  textSize(25); 
+  text("Dice Simulator", width/2 - 150, height- 80);
+  text("Blackjack", width/2 + 150, height-80);
+
+  if (mouseX > 420 && mouseX < 600 && mouseY > 560 && mouseY < height -40) {
+    if (mousePressed) {
+      gameScreen = 1;
+    } else {
+      cursor(HAND);
+    }
+  } else {
+    cursor(ARROW);
+  }
+
+  if (mouseX > 100 && mouseX < 300 && mouseY > 560 && mouseY < height - 40) {
+    if (mousePressed) {
+      gameScreen = 2;
+    } else {
+      cursor(HAND);
+    }
+  } else {
+    cursor(ARROW);
+  }
+}
+
+void diceSimulator() {
+  textAlign(LEFT);
   background(255);
   autorollBox();
   if (autoroll)
@@ -38,18 +96,33 @@ void draw() {
   fill(0);
   textSize(15);
   text(sum, width -150, height - 150);
+  textSize(12);
+  text("Return to home >", 30, 15);
+  if (mouseX > 0 && mouseX < 150 && mouseY > 0 && mouseY < 30) {
+    if (mousePressed) {
+      gameScreen = 0;
+    } else {
+      cursor(HAND);
+    }
+  } else {
+    cursor(ARROW);
+  }
   println(sum);
 }
 
-void mousePressed() {
-  if ((mouseX >= 550 && mouseX <= 650)&& (mouseY >= 600 && mouseY <= 650)) { 
-    if (!autoroll)
-      sum = 0;
-    autoroll = !autoroll;
+void drawGameScreen() {
+  background(255);
+  textAlign(LEFT);
+  textSize(12);
+  text("Return to home >", 30, 15);
+  if (mouseX > 0 && mouseX < 150 && mouseY > 0 && mouseY < 30) {
+    if (mousePressed) {
+      gameScreen = 0;
+    } else {
+      cursor(HAND);
+    }
   } else {
-    if (!autoroll)
-      sum = 0;
-    reRollAll();
+    cursor(ARROW);
   }
 }
 
@@ -172,12 +245,12 @@ class Die {
     toggle = (int)random(1, 7);
     faceFreq[toggle - 1]++;
     currFaceFreq[toggle - 1]++;
-  }
+  } 
 
   void show_rect() { 
     //Dice
     fill(255);
-    rect(xPos, yPos, 70, 70);
+    rect(xPos, yPos, 70, 70, 8);
   }
 
   void show_ellipse() {
