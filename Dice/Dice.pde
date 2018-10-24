@@ -5,7 +5,8 @@ Card[] dealCards;
 int NUM_OF_CARDS = 52;
 int sum = 0;
 int gameScreen = 0;
-int cardNumber = (int) random(0, 52);
+int handSize = 2;
+int[] currentHand = {(int) random(0, 52), (int) random(0, 52), (int) random(0, 52), (int) random(0, 52), (int) random(0, 52)};
 int[] cardIndex = new int[52];
 boolean autoroll = false;
 float currMax;
@@ -59,14 +60,16 @@ void mousePressed() {
       reRollAll();
     }
   }
+  /*
   if (gameScreen == 1) {
-    cardNumber = (int) random(0, 52);
-    loop();
-  }
+   for (int i = 0; i < currentHand.length; i++) {
+   currentHand[i] = (int) random(0, 52);
+   }
+   }
+   */
 }
 
 void initScreen() {
-  loop();
   background(80);
   textAlign(CENTER);
   fill(135, 206, 250);
@@ -98,7 +101,6 @@ void initScreen() {
 }
 
 void diceSimulator() {
-  loop();
   textAlign(LEFT);
   background(255);
   autorollBox();
@@ -129,18 +131,22 @@ void diceSimulator() {
 }
 
 void drawGameScreen() {
-  noLoop();
   background(255);
   textAlign(LEFT); 
   hand();
   hitBox();
-  println("Card Index: " + cardNumber);
+  println("Hand Size: " + handSize);
+  if (mouseX > 540 && mouseX < 660 && mouseY > 490 && mouseY < 560) {
+    if (mousePressed) {
+      handSize++;
+    }
+  }
+
   fill(0);
   textSize(15);
   text("Return to home >", 30, 15);
   if (mouseX > 0 && mouseX < 150 && mouseY > 0 && mouseY < 30) {
     if (mousePressed) {
-      loop();
       gameScreen = 0;
     } else {
       cursor(HAND);
@@ -160,22 +166,22 @@ void buildDeck() {
 }
 
 void hand() {
-  dealCards[cardNumber].show_card(200, 500);
-  checkNumber();
-  dealCards[cardNumber].show_card(300, 500);
-}
+  dealCards[currentHand[0]].show_card(100, 500);
+  dealCards[currentHand[1]].show_card(200, 500);
+  if (handSize == 3)
+    dealCards[currentHand[2]].show_card(300, 500);
 
-void checkNumber() {
-  int counter = 0;
-  cardIndex[counter] = cardNumber;
-  cardNumber = (int) random(0, 52);
-  for (int i = 0; i < cardIndex.length; i++) {
-    if (cardNumber == cardIndex[i]) {
-      cardNumber = (int) random(0, 52);
-      i = 0;
-    }
+  if (handSize == 4) {
+    dealCards[currentHand[2]].show_card(300, 500);
+    dealCards[currentHand[3]].show_card(400, 500);
+  }
+  if (handSize == 5) {
+    dealCards[currentHand[2]].show_card(300, 500);
+    dealCards[currentHand[3]].show_card(400, 500);
+    dealCards[currentHand[4]].show_card(500, 500);
   }
 }
+
 void hitBox() {
   fill(200);
   rect(550, 500, 100, 50);
@@ -183,7 +189,7 @@ void hitBox() {
   fill(0);
   textSize(19);
   text("Hit", 570, 530);
-  text("Stand" , 570, 590);
+  text("Stand", 570, 590);
 }
 void autorollBox() {
   fill(200);
