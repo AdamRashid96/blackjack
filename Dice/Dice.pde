@@ -2,11 +2,11 @@
 import java.util.Arrays;
 Die[] diceRoll;
 Card[] dealCards;
-int NUM_OF_CARDS = 9;
-int rowOfCards = 3;
-int collumnOfCards = 3;
+int NUM_OF_CARDS = 52;
 int sum = 0;
 int gameScreen = 0;
+int cardNumber = (int) random(0, 52);
+int[] cardIndex = new int[52];
 boolean autoroll = false;
 float currMax;
 float totalMax;
@@ -31,13 +31,10 @@ void setup() {
     }
   }
 
-  for (int j = 0; j < collumnOfCards; j ++) {
-    int yPos = 200 * j + 30;
-    for (int i = 0; i < rowOfCards; i ++) {
-      int xPos = 200 * i + 30;
-      dealCards[j*3 + i] = new Card(xPos, yPos);
-    }
+  for (int i = 0; i < NUM_OF_CARDS; i++) {
+    dealCards[i] = new Card();
   }
+  buildDeck();
 }
 
 void draw() {
@@ -48,7 +45,6 @@ void draw() {
   } else if (gameScreen == 2) {
     diceSimulator();
   }
-  println(gameScreen);
 }
 
 void mousePressed() {
@@ -64,14 +60,13 @@ void mousePressed() {
     }
   }
   if (gameScreen == 1) {
-    Arrays.fill(currFaceFreq, 0);
-    for (int i = 0; i < dealCards.length; i++) {
-      dealCards[i].shuffle();
-    }
+    cardNumber = (int) random(0, 52);
+    loop();
   }
 }
 
 void initScreen() {
+  loop();
   background(80);
   textAlign(CENTER);
   fill(135, 206, 250);
@@ -103,6 +98,7 @@ void initScreen() {
 }
 
 void diceSimulator() {
+  loop();
   textAlign(LEFT);
   background(255);
   autorollBox();
@@ -133,16 +129,18 @@ void diceSimulator() {
 }
 
 void drawGameScreen() {
+  noLoop();
   background(255);
-  textAlign(LEFT);
-  textSize(12);
-  for (int i = 0; i < dealCards.length; i++) {
-    dealCards[i].show_card();
-  }
-
+  textAlign(LEFT); 
+  hand();
+  hitBox();
+  println("Card Index: " + cardNumber);
+  fill(0);
+  textSize(15);
   text("Return to home >", 30, 15);
   if (mouseX > 0 && mouseX < 150 && mouseY > 0 && mouseY < 30) {
     if (mousePressed) {
+      loop();
       gameScreen = 0;
     } else {
       cursor(HAND);
@@ -152,6 +150,41 @@ void drawGameScreen() {
   }
 }
 
+void buildDeck() {
+  for (int i = 1; i <=4; i++) {
+    for (int j = 1; j <= 13; j++) {
+      dealCards[((i-1) * 13) + (j - 1)].toggleSuit = i;
+      dealCards[((i-1) * 13) + (j - 1)].toggleNumber = j;
+    }
+  }
+}
+
+void hand() {
+  dealCards[cardNumber].show_card(200, 500);
+  checkNumber();
+  dealCards[cardNumber].show_card(300, 500);
+}
+
+void checkNumber() {
+  int counter = 0;
+  cardIndex[counter] = cardNumber;
+  cardNumber = (int) random(0, 52);
+  for (int i = 0; i < cardIndex.length; i++) {
+    if (cardNumber == cardIndex[i]) {
+      cardNumber = (int) random(0, 52);
+      i = 0;
+    }
+  }
+}
+void hitBox() {
+  fill(200);
+  rect(550, 500, 100, 50);
+  rect(550, 560, 100, 50);
+  fill(0);
+  textSize(19);
+  text("Hit", 570, 530);
+  text("Stand" , 570, 590);
+}
 void autorollBox() {
   fill(200);
   rect(550, 600, 100, 50);
@@ -326,29 +359,31 @@ class Card {
   PImage diamonds;
   int xPos;
   int yPos;
-  int toggleNumber = 1;
-  int toggleSuit = 3;
+  int toggleNumber;
+  int toggleSuit;
 
-  Card(int x, int y) {
-    xPos = x;
-    yPos = y;
+  Card() {
+    //xPos = x;
+    //yPos = y;
     heart = loadImage("heart.png");
     diamonds = loadImage("diamonds.png");
     spade = loadImage("spade.png");
     clubs = loadImage("clubs.png");
-    shuffle();
+    //shuffle();
   }
   void shuffle() {
     toggleNumber = (int)random(1, 14);
     toggleSuit = (int)random(1, 5);
   }
 
-  void show_card() { 
+  void show_card(int x, int y) { 
     //Dice
+    xPos = x;
+    yPos = y;
     fill(255);
     rect(xPos, yPos, 100, 150, 2);
-    show_face();
     show_suit();
+    show_face();
   }
 
   void show_face() {
@@ -417,16 +452,16 @@ class Card {
   void show_suit() {
     switch(toggleSuit) {
     case 1:
-      image(heart, xPos + 20, yPos + 50, 50, 50);
+      image(heart, xPos + 30, yPos + 55, 40, 40);
       break;
     case 2:
-      image(diamonds, xPos + 20, yPos + 50, 50, 50);
+      image(diamonds, xPos + 30, yPos + 55, 40, 40);
       break;
     case 3:
-      image(spade, xPos + 20, yPos + 50, 50, 50);
+      image(spade, xPos + 3, yPos + 25, 90, 90);
       break;
     case 4:
-      image(clubs, xPos + 20, yPos + 50, 50, 50);
+      image(clubs, xPos + 20, yPos + 40, 60, 60);
       break;
     }
   }
