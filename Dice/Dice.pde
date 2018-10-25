@@ -7,8 +7,10 @@ int sum = 0;
 int gameScreen = 0;
 int handSize = 2;
 int totalOfHand = 0;
-int[] currentHand = {(int) random(0, 52), (int) random(0, 52), (int) random(0, 52), (int) random(0, 52), (int) random(0, 52), (int) random(0, 52), (int) random(0, 52), (int) random(0, 52)};
+int totalOfDealer = 0;
+int gameSenario = 0; //0 is Lose, 1 is win
 int[] cardIndex = new int[52];
+boolean dealerTurn = false;
 boolean handTotalToggle = true;
 boolean autoroll = false;
 boolean hitToggle = true;
@@ -39,6 +41,7 @@ void setup() {
     dealCards[i] = new Card();
   }
   buildDeck();
+  shuffleDeck();
 }
 
 void draw() {
@@ -48,6 +51,8 @@ void draw() {
     drawGameScreen();
   } else if (gameScreen == 2) {
     diceSimulator();
+  } else if (gameScreen == 3) {
+    endScreen();
   }
 }
 
@@ -138,15 +143,24 @@ void drawGameScreen() {
   background(255);
   textAlign(LEFT); 
   hand();
+  dealer();
   handTotal();
   hitBox();
   println("Hand Size: " + handSize);
-  if (mouseX > 540 && mouseX < 660 && mouseY > 490 && mouseY < 560) {
-    if (mousePressed && hitToggle) {
-      handSize++;
-      totalOfHand = 0;
-      handTotalToggle = true;
-      hitToggle = false;
+  if (!dealerTurn) {
+    if (mouseX > 540 && mouseX < 660 && mouseY > 490 && mouseY < 555) {
+      if (mousePressed && hitToggle) {
+        handSize++;
+        totalOfHand = 0;
+        handTotalToggle = true;
+        hitToggle = false;
+      }
+    }
+
+    if (mouseX > 540 && mouseX < 660 && mouseY > 560 && mouseY < 625) {
+      if (mousePressed) {
+        dealerTurn = true;
+      }
     }
   }
 
@@ -164,7 +178,22 @@ void drawGameScreen() {
   }
 }
 
-//Makes the object Array into and ordered deck of cards
+//Creates the endscreen if they won or lost
+void endScreen() {
+  if (gameSenario == 0) {
+    fill(0);
+    textSize(30);
+    textAlign(CENTER);
+    text("Busted!", width/2, height/2);
+  } else if (gameSenario == 1) {
+    fill(0);
+    textSize(30);
+    textAlign(CENTER);
+    text("Blackjack!", width/2, height/2);
+  }
+}
+
+//Makes the object Array into an ordered deck of cards
 void buildDeck() {
   for (int i = 1; i <=4; i++) {
     for (int j = 1; j <= 13; j++) {
@@ -174,27 +203,47 @@ void buildDeck() {
   }
 }
 
+void shuffleDeck() {
+  for (int i = 0; i < dealCards.length; i++) {
+    int j = (int)(Math.random()*52);
+    Card c = dealCards[j];
+    dealCards[j] = dealCards[i];
+    dealCards[i] = c;
+  }
+}
+
+//Makes the dealers Hand and Turn
+void dealer() {
+  dealCards[8].show_card(250, 10);
+  if (dealerTurn) {
+    dealCards[9].show_card(350, 10);
+    if(dealCards[8].toggleNumber + dealCards[9].toggleNumber < 17){
+      dealCards[10].show_card(350, 10);
+    }
+  }
+}
+
 //This Draws the two cards
 void hand() {
   switch(handSize) { //Checks Hand Size every time hit is clicked and draws a card
   case 8:
-    dealCards[currentHand[7]].show_card(250, 350);
+    dealCards[7].show_card(250, 350);
   case 7:
-    dealCards[currentHand[6]].show_card(150, 350);
+    dealCards[6].show_card(150, 350);
   case 6:
-    dealCards[currentHand[5]].show_card(50, 350);
+    dealCards[5].show_card(50, 350);
   case 5:
-    dealCards[currentHand[4]].show_card(450, 500);
+    dealCards[4].show_card(450, 500);
   case 4:
-    dealCards[currentHand[3]].show_card(350, 500);
+    dealCards[3].show_card(350, 500);
   case 3:
-    dealCards[currentHand[0]].show_card(50, 500);
-    dealCards[currentHand[1]].show_card(150, 500);
-    dealCards[currentHand[2]].show_card(250, 500);
+    dealCards[0].show_card(50, 500);
+    dealCards[1].show_card(150, 500);
+    dealCards[2].show_card(250, 500);
     break;
   default:
-    dealCards[currentHand[0]].show_card(50, 500);
-    dealCards[currentHand[1]].show_card(150, 500);
+    dealCards[0].show_card(50, 500);
+    dealCards[1].show_card(150, 500);
     break;
   }
 }
@@ -214,69 +263,69 @@ void handTotal() {
   if (handTotalToggle) {
     switch(handSize) { //Checks Hand Size every time hit is clicked and draws a card
     case 8:
-      if (dealCards[currentHand[7]].toggleNumber == 11 || dealCards[currentHand[7]].toggleNumber == 12 || dealCards[currentHand[7]].toggleNumber == 13) {
+      if (dealCards[7].toggleNumber == 11 || dealCards[7].toggleNumber == 12 || dealCards[7].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[7]].toggleNumber == 1) {
+      } else if (dealCards[7].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[7]].toggleNumber;
+        totalOfHand += dealCards[7].toggleNumber;
       }
     case 7:
-      if (dealCards[currentHand[6]].toggleNumber == 11 || dealCards[currentHand[6]].toggleNumber == 12 || dealCards[currentHand[6]].toggleNumber == 13) {
+      if (dealCards[6].toggleNumber == 11 || dealCards[6].toggleNumber == 12 || dealCards[6].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[6]].toggleNumber == 1) {
+      } else if (dealCards[6].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[6]].toggleNumber;
+        totalOfHand += dealCards[6].toggleNumber;
       }
     case 6:
-      if (dealCards[currentHand[5]].toggleNumber == 11 || dealCards[currentHand[5]].toggleNumber == 12 || dealCards[currentHand[5]].toggleNumber == 13) {
+      if (dealCards[5].toggleNumber == 11 || dealCards[5].toggleNumber == 12 || dealCards[5].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[5]].toggleNumber == 1) {
+      } else if (dealCards[5].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[5]].toggleNumber;
+        totalOfHand += dealCards[5].toggleNumber;
       }
 
     case 5:
-      if (dealCards[currentHand[4]].toggleNumber == 11 || dealCards[currentHand[4]].toggleNumber == 12 || dealCards[currentHand[4]].toggleNumber == 13) {
+      if (dealCards[4].toggleNumber == 11 || dealCards[4].toggleNumber == 12 || dealCards[4].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[4]].toggleNumber == 1) {
+      } else if (dealCards[4].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[4]].toggleNumber;
+        totalOfHand += dealCards[4].toggleNumber;
       }
     case 4:
-      if (dealCards[currentHand[3]].toggleNumber == 11 || dealCards[currentHand[3]].toggleNumber == 12 || dealCards[currentHand[3]].toggleNumber == 13) {
+      if (dealCards[3].toggleNumber == 11 || dealCards[3].toggleNumber == 12 || dealCards[3].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[3]].toggleNumber == 1) {
+      } else if (dealCards[3].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[3]].toggleNumber;
+        totalOfHand += dealCards[3].toggleNumber;
       }
     case 3:
-      if (dealCards[currentHand[2]].toggleNumber == 11 || dealCards[currentHand[2]].toggleNumber == 12 || dealCards[currentHand[2]].toggleNumber == 13) {
+      if (dealCards[2].toggleNumber == 11 || dealCards[2].toggleNumber == 12 || dealCards[2].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[2]].toggleNumber == 1) {
+      } else if (dealCards[2].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[2]].toggleNumber;
+        totalOfHand += dealCards[2].toggleNumber;
       }
     default:
-      if (dealCards[currentHand[0]].toggleNumber == 11 || dealCards[currentHand[0]].toggleNumber == 12 || dealCards[currentHand[0]].toggleNumber == 13) {
+      if (dealCards[0].toggleNumber == 11 || dealCards[0].toggleNumber == 12 || dealCards[0].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[0]].toggleNumber == 1) {
+      } else if (dealCards[0].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[0]].toggleNumber;
+        totalOfHand += dealCards[0].toggleNumber;
       }
 
-      if (dealCards[currentHand[1]].toggleNumber == 11 || dealCards[currentHand[1]].toggleNumber == 12 || dealCards[currentHand[1]].toggleNumber == 13) {
+      if (dealCards[1].toggleNumber == 11 || dealCards[1].toggleNumber == 12 || dealCards[1].toggleNumber == 13) {
         totalOfHand += 10;
-      } else if (dealCards[currentHand[1]].toggleNumber == 1) {
+      } else if (dealCards[1].toggleNumber == 1) {
         totalOfHand += 11;
       } else {
-        totalOfHand += dealCards[currentHand[1]].toggleNumber;
+        totalOfHand += dealCards[1].toggleNumber;
       }
       handTotalToggle = false;
       break;
@@ -284,74 +333,115 @@ void handTotal() {
   }
   switch(handSize) {
   case 8:
-    if (dealCards[currentHand[7]].toggleNumber == 1 && totalOfHand > 21) {
+    if (dealCards[7].toggleNumber == 1 && totalOfHand > 21) {
       totalOfHand -= 10;
     }
 
     if (totalOfHand == 21) {
+      gameSenario = 1;
+      gameScreen = 3;
       println("Blackjack");
     }
 
     if (totalOfHand > 21) {
+      gameSenario = 0;
+      gameScreen = 3;
       println("Busted");
     }
   case 7:
-    if (dealCards[currentHand[6]].toggleNumber == 1 && totalOfHand > 21) {
+    if (dealCards[6].toggleNumber == 1 && totalOfHand > 21) {
       totalOfHand -= 10;
     }
     if (totalOfHand == 21) {
+      gameSenario = 1;
+      gameScreen = 3;
       println("Blackjack");
     }
 
     if (totalOfHand > 21) {
+      gameSenario = 0;
+      gameScreen = 3;
       println("Busted");
     }
   case 6:
-    if (dealCards[currentHand[5]].toggleNumber == 1 && totalOfHand > 21) {
+    if (dealCards[5].toggleNumber == 1 && totalOfHand > 21) {
       totalOfHand -= 10;
     }
 
     if (totalOfHand == 21) {
+      gameSenario = 1;
+      gameScreen = 3;
       println("Blackjack");
     }
 
     if (totalOfHand > 21) {
+      gameSenario = 0;
+      gameScreen = 3;
       println("Busted");
     }
   case 5:
-    if (dealCards[currentHand[4]].toggleNumber == 1 && totalOfHand > 21) {
+    if (dealCards[4].toggleNumber == 1 && totalOfHand > 21) {
       totalOfHand -= 10;
     }
 
     if (totalOfHand == 21) {
+      gameSenario = 1;
+      gameScreen = 3;
       println("Blackjack");
     }
 
     if (totalOfHand > 21) {
+      gameSenario = 0;
+      gameScreen = 3;
       println("Busted");
     }
   case 4:
-    if (dealCards[currentHand[3]].toggleNumber == 1 && totalOfHand > 21) {
+    if (dealCards[3].toggleNumber == 1 && totalOfHand > 21) {
       totalOfHand -= 10;
     }
 
     if (totalOfHand == 21) {
+      gameSenario = 1;
+      gameScreen = 3;
       println("Blackjack");
     }
 
     if (totalOfHand > 21) {
+      gameSenario = 0;
+      gameScreen = 3;
       println("Busted");
     }
   case 3:
-    if ((dealCards[currentHand[0]].toggleNumber == 1 || dealCards[currentHand[1]].toggleNumber == 1 || dealCards[currentHand[2]].toggleNumber == 1) && totalOfHand > 21) {
+    if ((dealCards[0].toggleNumber == 1 || dealCards[1].toggleNumber == 1 || dealCards[2].toggleNumber == 1) && totalOfHand > 21) {
       totalOfHand -= 10;
     }
 
     if (totalOfHand == 21) {
+      gameSenario = 1;
+      gameScreen = 3;
       println("Blackjack");
     }
 
     if (totalOfHand > 21) {
+      gameSenario = 0;
+      gameScreen = 3;
+      println("Busted");
+    }
+    break;
+  case 2:
+    if ((dealCards[0].toggleNumber == 1 || dealCards[1].toggleNumber == 1) && totalOfHand > 21) {
+      totalOfHand -= 10;
+    }
+
+    if (totalOfHand == 21) {
+      gameSenario = 1;
+      gameScreen = 3;
+      println("Blackjack");
+    }
+
+    if (totalOfHand > 21) {
+      gameSenario = 0;
+      gameScreen = 3;
       println("Busted");
     }
     break;
