@@ -1,4 +1,4 @@
-/* @pjs preload="./Dice/heart.png","./Dice/spade.png","./Dice/clubs.png","./Dice/diamonds.png"; */
+/* @pjs preload="heart.png","spade.png","clubs.png","diamonds.png"; */
 import java.util.Arrays;
 Die[] diceRoll;
 Card[] dealCards;
