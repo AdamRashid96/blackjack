@@ -632,7 +632,10 @@ void autorollBox() {
 
 //Refills the array with new values and increments the sum
 void reRollAll() {
-  Arrays.fill(currFaceFreq, 0);
+  //Arrays.fill(currFaceFreq, 0);
+  for (int c = 0; c < currFaceFreq.length; c++) {
+    currFaceFreq[c] = 0;
+  }
   for (int i = 0; i < diceRoll.length; i++) {
     diceRoll[i].roll();
     sum += diceRoll[i].toggle;
